@@ -1,0 +1,82 @@
+# Temporada alta: logaritmos vs dummies, y diagnóstico
+
+<!-- Responsable: Persona 2. Child de informe.Rmd.
+     Reemplazar cada "PENDIENTE" por texto propio basado en los resultados. -->
+
+## Camino A: logaritmo del KPI (Modelo 3)
+
+Sales y Orders son estrictamente positivos (`funciones_caminos.R` lo verifica), así que el logaritmo está definido. En el modelo $\ln(KPI) = \dots + \beta \cdot Costo$, el valor $100\,(e^{\beta} - 1)$ es el cambio porcentual del KPI asociado a 1 u.m. adicional de costo. La columna `efecto_pct_por_1000` lo reporta por cada 1.000 u.m.
+
+## Camino B: dummies de calendario (Modelo 4)
+
+```{r dummies}
+dm <- leer_tab("08_dummies_semanas")
+knitr::kable(data.frame(
+  Dummy = c("D_FinAno", "D_Navidad", "D_Verano"),
+  Regla = c("Semana se cruza con [Thanksgiving, 24-dic]",
+            "Semana se cruza con [25-dic, 1-ene]",
+            "Semana se cruza con [Memorial Day, Labor Day]"),
+  Semanas = c(sum(dm$D_FinAno), sum(dm$D_Navidad), sum(dm$D_Verano))
+), caption = "Dummies de temporada definidas solo con fechas de calendario de EE. UU.")
+```
+
+**PENDIENTE (Persona 2):** justificar las dummies con el calendario de viajes de EE. UU.: Thanksgiving y fin de año son los períodos de mayor volumen de viajes, y el verano entre Memorial Day y Labor Day es la temporada de vacaciones por carretera. Aclarar que no se definieron mirando cuándo el KPI fue alto, y comentar si los picos observados en la sección de exploración caen o no dentro de esas semanas.
+
+```{r caminos}
+cc <- leer_tab("08_caminos_coeficientes")
+cc <- cc[grepl("_Sales$", cc$modelo) & cc$termino != "(Intercept)", ]
+knitr::kable(cc[, c("modelo", "termino", "estimacion", "p_valor", "p_valor_hac", "efecto_pct_por_1000")],
+             digits = 4, format.args = list(big.mark = ","),
+             caption = "Coeficientes de los cuatro modelos para Sales (Orders: ver anexo)")
+```
+
+## Comparación de los caminos sobre una muestra común
+
+```{r comparacion}
+aj <- leer_tab("08_caminos_ajuste_muestra_comun")
+knitr::kable(aj[, c("modelo", "n", "escala_dependiente", "r2_aj", "MAE_dentro_muestra", "RMSE_dentro_muestra")],
+             digits = 3, format.args = list(big.mark = ","),
+             caption = "Ajuste en la muestra completa (el R2 ajustado de los modelos log NO es comparable con el de los modelos en niveles)")
+mf <- leer_tab("09_metricas_fuera_muestra")
+knitr::kable(mf[mf$kpi == "Sales", c("modelo", "n_train", "n_test", "MAE", "RMSE", "MAE_rel_media")],
+             digits = 3, format.args = list(big.mark = ","),
+             caption = "Capacidad predictiva fuera de muestra (Sales, escala original). Entrenamiento hasta 2025-08-31")
+```
+
+```{r pred-fig}
+knitr::include_graphics(fig("09_predicciones_test_Sales"))
+```
+
+**PENDIENTE (Persona 2):** explicar:
+
+- Qué problema intenta resolver cada camino: el log comprime la escala y estabiliza la varianza; las dummies capturan el cambio de nivel en temporada.
+- Qué cambia en la interpretación: efectos en % frente a efectos en u.m.
+- Cuándo los dos caminos son complementarios (M5).
+- Cómo se retransformaron las predicciones del log (exp ingenuo frente a smearing de Duan) y por qué importa.
+- Qué modelo predice mejor según el MAE y el RMSE. No elegir por el $R^2$, porque la variable dependiente tiene otra escala.
+
+Mencionar que el entrenamiento contiene una sola temporada alta.
+
+## Diagnóstico
+
+```{r diag-fig, out.width="49%", fig.show="hold"}
+knitr::include_graphics(c(fig("10_residuos_vs_ajustados"), fig("10_residuos_vs_tiempo")))
+```
+
+```{r diag-tab}
+pf <- leer_tab("10_pruebas_formales")
+knitr::kable(pf[grepl("_Sales$", pf$modelo),
+                c("modelo", "BP_p", "DW", "BG4_p", "ACF_rezago1", "ACF_rezago52", "banda_95")],
+             digits = 3,
+             caption = "Pruebas formales (p-valores). BP: heterocedasticidad; DW y BG(4): autocorrelación")
+```
+
+**PENDIENTE (Persona 2):** explicar qué mide cada prueba:
+
+- Breusch-Pagan: H0 de varianza constante.
+- Durbin-Watson y Breusch-Godfrey: H0 de que no hay autocorrelación de orden 1 y de hasta orden 4.
+- VIF: inflación de la varianza por colinealidad.
+- Distancia de Cook: influencia de cada observación.
+- ACF en el rezago 52 y residuos por mes: estacionalidad que queda sin explicar.
+
+Luego decir cómo cambian (o no) la decisión de modelo. Por ejemplo, si hay autocorrelación, la inferencia se apoya en los p-valores HAC. Comentar `10_sensibilidad_influyentes`: ¿los coeficientes cambian mucho al quitar las semanas influyentes? Recordar que agregar variables no mejora automáticamente la especificación.

@@ -1,0 +1,48 @@
+# Modelos de regresión simple y múltiple
+
+<!-- Responsable: Persona 2. Child de informe.Rmd.
+     Reemplazar cada "PENDIENTE" por texto propio basado en los resultados. -->
+
+## Modelo (1): regresiones simples por canal
+
+```{r m1}
+c1 <- leer_tab("06_simples_coeficientes")
+a1 <- leer_tab("06_simples_ajuste")
+knitr::kable(c1[, c("modelo", "termino", "estimacion", "error_std", "t", "p_valor", "ic95_inf", "ic95_sup")],
+             digits = 3, format.args = list(big.mark = ","),
+             caption = "Modelo (1): Sales sobre el costo de un solo canal")
+knitr::kable(a1[, c("modelo", "n", "r2", "r2_aj", "F", "p_F")], digits = 3,
+             caption = "Ajuste de las regresiones simples")
+```
+
+**PENDIENTE (Persona 2):** comparar los signos, las magnitudes (por 1.000 u.m.), los intervalos y la significancia de los tres canales. Explicar por qué una regresión simple puede confundir el efecto del canal con la estacionalidad y con los otros canales (sesgo por variable omitida).
+
+## Modelo (2): regresión múltiple con controles
+
+```{r m2-pertinencia}
+p2 <- leer_tab("07_pertinencia_controles")
+knitr::kable(p2, digits = 3, caption = "Pertinencia de los controles candidatos")
+```
+
+**PENDIENTE (Persona 2):** explicar qué controles quedaron y por qué. Comentar los VIF (`07_historial_vif`), las correlaciones entre candidatos (por ejemplo, SP500 y WEI pueden capturar la misma tendencia macroeconómica) y el posible problema de incluir Trends, que es contemporáneo a las ventas.
+
+```{r m2}
+c2 <- leer_tab("07_multiple_coeficientes")
+a2 <- leer_tab("07_multiple_ajuste")
+knitr::kable(c2[, c("modelo", "termino", "estimacion", "error_std", "t", "p_valor",
+                    "ic95_inf", "ic95_sup", "p_valor_hac")],
+             digits = 3, format.args = list(big.mark = ","),
+             caption = "Modelo (2) para Sales y Orders. p_valor_hac: errores Newey-West")
+knitr::kable(a2[, c("modelo", "n", "k", "r2", "r2_aj", "F", "p_F")], digits = 3,
+             caption = "Ajuste y prueba F global del Modelo (2)")
+```
+
+**PENDIENTE (Persona 2):** para cada coeficiente:
+
+- Interpretarlo con unidades: "manteniendo constantes los demás regresores, 1 u.m. más de costo en X se asocia con $\beta$ u.m. de Sales".
+- Plantear $H_0: \beta_j = 0$ contra $H_1: \beta_j \neq 0$, y leer t, p e IC 95 %.
+- Interpretar el intercepto y decir si tiene sentido económico.
+- Leer $R^2$, $R^2$ ajustado y la prueba F ($H_0$: todas las pendientes son 0).
+- Decir si los signos son razonables.
+
+Recordar que, como Sales = 25.000 × Orders, los resultados de Orders son los de Sales divididos entre 25.000, con los mismos t y p. Cerrar con las limitaciones que impiden hablar de incrementalidad: el presupuesto se asigna anticipando la demanda, hay variables omitidas y no existe variación exógena del gasto.

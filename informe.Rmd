@@ -1,0 +1,116 @@
+---
+title: "Caso 3: Marketing digital y demanda de alquiler de vehículos"
+subtitle: "Business Analytics 2026-3 — Pontificia Universidad Javeriana"
+author: "Persona 1 · Persona 2"
+date: "`r format(Sys.Date(), '%d/%m/%Y')`"
+output:
+  pdf_document:
+    number_sections: true
+    toc: false
+    fig_caption: true
+    latex_engine: xelatex
+geometry: margin=2cm
+fontsize: 10pt
+lang: es
+---
+
+<!-- Responsable: Persona 2 (archivo maestro). Cada sección vive en
+      y la edita SOLO su responsable, para evitar conflictos.
+     Se compila con main.R o con el botón Knit (las rutas se resuelven solas).
+     Límite: 5 páginas sin contar anexos. -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,
+                      fig.align = "center", out.width = "85%")
+# Raíz del proyecto (funciona con main.R y con el botón Knit)
+RAIZ <- normalizePath(getwd())   # informe.Rmd está en la raíz, junto a main.R
+leer_tab <- function(nombre) {
+  read.csv(file.path(RAIZ, "outputs", "tablas", paste0(nombre, ".csv")), check.names = FALSE)
+}
+fig <- function(nombre) file.path(RAIZ, "outputs", "figuras", paste0(nombre, ".png"))
+seccion <- function(archivo) file.path(RAIZ, archivo)
+```
+
+```{r child = seccion("01_datos.Rmd")}
+```
+
+```{r child = seccion("02_exploracion.Rmd")}
+```
+
+```{r child = seccion("03_modelos.Rmd")}
+```
+
+```{r child = seccion("04_comparacion_diagnostico.Rmd")}
+```
+
+```{r child = seccion("05_cierre.Rmd")}
+```
+
+\newpage
+
+# Anexos
+
+## A1. Auditoría de columnas de la base original
+
+```{r anexo-auditoria}
+knitr::kable(leer_tab("01_auditoria_columnas"), digits = 2, format.args = list(big.mark = ","))
+```
+
+## A2. Comprobación manual de agregados (detalle de la suma)
+
+```{r anexo-comprobacion}
+knitr::kable(leer_tab("02_comprobacion_manual")[, c("semana", "canal", "tipo", "operacion")])
+```
+
+## A3. Ficha completa de controles externos
+
+```{r anexo-ficha}
+knitr::kable(leer_tab("03_ficha_controles"))
+```
+
+## A4. Matriz de correlaciones
+
+```{r anexo-cor, out.width="95%"}
+knitr::include_graphics(fig("04_matriz_correlaciones"))
+```
+
+## A5. Gráficos complementarios
+
+```{r anexo-graficos, out.width="49%", fig.show="hold"}
+knitr::include_graphics(c(fig("05_impresiones_por_canal"), fig("05_costos_google"),
+                          fig("05_dispersion_sales_controles"), fig("05_series_controles")))
+```
+
+## A6. Coeficientes completos de los caminos A y B
+
+```{r anexo-caminos}
+cc <- leer_tab("08_caminos_coeficientes")
+knitr::kable(cc[, c("modelo", "termino", "estimacion", "p_valor", "p_valor_hac",
+                    "ic95_inf", "ic95_sup", "efecto_pct_por_1000")],
+             digits = 4, format.args = list(big.mark = ","))
+```
+
+## A7. Diagnósticos: VIF, influyentes y gráficos adicionales
+
+```{r anexo-diag}
+knitr::kable(leer_tab("10_vif"), digits = 2)
+knitr::kable(leer_tab("10_sensibilidad_influyentes"), digits = 4, format.args = list(big.mark = ","))
+```
+
+```{r anexo-diag-fig, out.width="49%", fig.show="hold"}
+knitr::include_graphics(c(fig("10_residuos_por_mes"), fig("10_acf_residuos")))
+```
+
+## A8. Reproducibilidad y uso de IA
+
+El repositorio contiene el código completo: ejecutar `source("main.R")` desde la raíz reproduce todas las tablas, los gráficos y este informe. La declaración de uso de IA de cada persona está en `uso_ia.md`.
+
+## A9. Referencias
+
+- Google LLC. *Google Trends*. https://trends.google.com/trends/ (consulta: ver `registro_descargas.csv`).
+- U.S. Energy Information Administration. *US Regular All Formulations Gas Price (GASREGW)*, recuperado de FRED, Federal Reserve Bank of St. Louis. https://fred.stlouisfed.org/series/GASREGW
+- U.S. Employment and Training Administration. *Initial Claims (ICSA)*, recuperado de FRED, Federal Reserve Bank of St. Louis. https://fred.stlouisfed.org/series/ICSA
+- Levine, D. M., Berenson, M. L. y Stephan, D. *Estadística para administración*. Caps. 10 y 11.
+- Wooldridge, J. M. *Introducción a la econometría*. Cap. 15.
+- Duan, N. (1983). Smearing estimate: a nonparametric retransformation method. *Journal of the American Statistical Association*, 78(383), 605–610.
+- Newey, W. K. y West, K. D. (1987). A simple, positive semi-definite, heteroskedasticity and autocorrelation consistent covariance matrix. *Econometrica*, 55(3), 703–708.
