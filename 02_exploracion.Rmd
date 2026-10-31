@@ -1,0 +1,32 @@
+# Exploración de los datos
+
+<!-- Responsable: Persona 1. Child de informe.Rmd.
+     Reemplazar cada "PENDIENTE" por texto propio basado en los resultados.
+     Describir asociaciones SIN atribuir causalidad (requisito del punto 4). -->
+
+## Estadísticas descriptivas
+
+```{r eda-desc}
+d <- leer_tab("04_descriptivos")
+knitr::kable(d[, c("variable", "N", "media", "de", "minimo", "maximo")],
+             digits = 2, format.args = list(big.mark = ","),
+             caption = "N, media, desviación estándar, mínimo y máximo de la base ampliada")
+```
+
+```{r eda-series, out.width="49%", fig.show="hold"}
+knitr::include_graphics(c(fig("05_serie_Sales"), fig("05_serie_Orders")))
+```
+
+```{r eda-costos, out.width="49%", fig.show="hold"}
+knitr::include_graphics(c(fig("05_costos_por_canal"), fig("05_dispersion_sales_costos")))
+```
+
+**PENDIENTE (Persona 1):** describir los picos de demanda (ver `04_semanas_pico`: en qué semanas ocurren y si se repiten cada año), los cambios de nivel entre años (`04_promedios_anuales`), la evolución del gasto por canal y las asociaciones que más llaman la atención en las dispersiones. No atribuir causalidad.
+
+```{r eda-cov}
+cs <- leer_tab("04_covarianzas_sales")
+knitr::kable(cs, digits = 3, format.args = list(big.mark = ","),
+             caption = "Covarianza y correlación de Sales con las demás variables")
+```
+
+**PENDIENTE (Persona 1):** explicar por qué la covarianza no permite comparar variables con escalas distintas y la correlación sí. La matriz completa de correlaciones va en el anexo.

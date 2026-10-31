@@ -1,0 +1,50 @@
+# Preparación de los datos y fuentes externas
+
+<!-- Responsable: Persona 1. Este archivo es un "child" de informe.Rmd:
+     usa las funciones leer_tab() y fig() definidas allí.
+     Reemplazar cada bloque "PENDIENTE" por texto propio, escrito con los
+     resultados ya obtenidos. No dejar ningún "PENDIENTE" en la versión final. -->
+
+## Reconocimiento de la base
+
+```{r datos-resumen}
+r <- leer_tab("01_resumen_general")
+knitr::kable(data.frame(
+  Concepto = c("Filas (semanas)", "Columnas", "Desde", "Hasta",
+               "Semanas consecutivas cada 7 días", "Semanas duplicadas",
+               "Valores faltantes", "Sales / Orders constante"),
+  Valor = c(r$filas, r$columnas, r$fecha_min, r$fecha_max,
+            r$semanas_consecutivas_7d, r$semanas_duplicadas, r$total_na,
+            ifelse(r$razon_Sales_Orders_constante,
+                   paste0("Sí (", format(r$razon_Sales_Orders, big.mark = ","), ")"), "No"))
+), caption = "Reconocimiento de Base_datos_caso_3.csv")
+```
+
+**PENDIENTE (Persona 1):** en 3 a 4 frases, explicar qué representa una fila, cuál es la fecha semanal, cuáles son las variables de respuesta (`Sales`, `Orders`) y qué columnas de publicidad hay. Mencionar que `Sales` es exactamente un múltiplo constante de `Orders` y qué implica eso para los modelos.
+
+```{r datos-ajustes}
+knitr::kable(leer_tab("01_registro_ajustes"),
+             caption = "Ajustes aplicados y su impacto sobre la muestra")
+```
+
+## Agregados de Amazon
+
+```{r datos-comprobacion}
+cm <- leer_tab("02_comprobacion_manual")
+knitr::kable(cm[, c("semana", "canal", "tipo", "suma_manual", "agregado_script", "diferencia")],
+             format.args = list(big.mark = ","),
+             caption = "Comprobación manual de las sumas por prefijo (dos semanas)")
+```
+
+**PENDIENTE (Persona 1):** explicar la regla de agregación por prefijo y sufijo, cuántas campañas forma cada canal y por qué Google queda fuera de los agregados. La columna `operacion` de `outputs/tablas/02_comprobacion_manual.csv` muestra la suma término a término; va en el anexo.
+
+## Controles externos
+
+```{r datos-ficha}
+f <- leer_tab("03_ficha_controles")
+knitr::kable(f[, c("variable", "termino_o_codigo", "fuente", "frecuencia_original",
+                   "regla_alineacion", "fecha_consulta")],
+             caption = "Series externas incorporadas (detalle completo en fuentes_y_glosario.md)")
+```
+
+**PENDIENTE (Persona 1):** justificar en 4 a 5 frases cada control (hipótesis sobre la demanda de alquiler). Explicar la configuración de Google Trends, aclarar que los índices son relativos y no volúmenes, y describir la regla de alineación que evita usar información todavía no publicada.

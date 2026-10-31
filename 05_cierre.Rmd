@@ -1,0 +1,18 @@
+# Cierre ejecutivo para la gerencia de marketing
+
+<!-- Responsable: Persona 1. Se redacta AL FINAL, cuando ya existen los
+     resultados de la Persona 2. Máximo 200 palabras (requisito del
+     punto 9). Usar los números de las tablas, no inventar cifras. -->
+
+**PENDIENTE (Persona 1, con aportes de la Persona 2) — máximo 200 palabras.** Debe cubrir, en este orden:
+
+1. **Asociaciones encontradas:** qué canal de Amazon se asocia con más ventas por cada u.m. invertida, con su intervalo, y cuáles no son significativos.
+2. **Especificación más defendible:** cuál modelo (nivel, log, dummies o log + dummies) y por qué. Debe basarse en el MAE y RMSE fuera de muestra y en los diagnósticos, no solo en el $R^2$.
+3. **Papel de los controles externos:** cuáles se quedaron en el modelo y qué cambió al incluirlos.
+4. **Limitaciones:** datos observacionales, presupuesto que se asigna anticipando la demanda (causalidad inversa), estacionalidad y una sola temporada alta en el entrenamiento.
+5. **Qué se puede concluir y qué no:** una regresión observacional muestra asociaciones condicionales, no incrementalidad. Para medir el efecto causal hacen falta experimentos (geo-tests o *holdouts* de campañas, pruebas A/B de pauta) o variación exógena del gasto.
+
+```{r cierre-conteo, eval=FALSE}
+# Para contar palabras del cierre antes de entregar:
+# length(strsplit("pegar aquí el texto", "\\s+")[[1]])
+```
