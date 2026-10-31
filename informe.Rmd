@@ -9,7 +9,7 @@ output:
     toc: false
     fig_caption: true
     latex_engine: xelatex
-geometry: margin=2cm
+geometry: margin=1.5cm
 fontsize: 10pt
 lang: es
 ---
@@ -98,7 +98,8 @@ knitr::kable(leer_tab("10_sensibilidad_influyentes"), digits = 4, format.args = 
 ```
 
 ```{r anexo-diag-fig, out.width="49%", fig.show="hold"}
-knitr::include_graphics(c(fig("10_residuos_por_mes"), fig("10_acf_residuos")))
+knitr::include_graphics(c(fig("10_residuos_vs_ajustados"), fig("10_residuos_vs_tiempo"),
+                          fig("10_residuos_por_mes"), fig("10_acf_residuos")))
 ```
 
 ## A8. Tablas complementarias del cuerpo del informe

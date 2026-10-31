@@ -21,21 +21,6 @@ knitr::include_graphics(c(fig("05_serie_Sales"), fig("05_serie_Orders")))
 knitr::include_graphics(c(fig("05_costos_por_canal"), fig("05_dispersion_sales_costos")))
 ```
 
-Las ventas semanales promedian 7,26 millones de u.m., pero varían mucho: la desviación estándar (6,56 millones) es casi igual a la media. El rango va de 2,85 millones a 36,77 millones (semana del 14 de diciembre de 2025).
+Las ventas promedian 7,26 millones de u.m. por semana, con una desviación estándar casi igual (6,56 millones). **Las 8 semanas más altas están entre Thanksgiving y mediados de diciembre**, y el patrón se repite en 2024 y 2025: diciembre promedia 23,7 millones y julio 3,4 millones. El promedio semanal subió de 7,53 millones (2024) a 8,23 millones (2025); el de 2026 no es comparable porque no incluye temporada alta. El gasto de los tres canales también se dispara en noviembre y diciembre (por ejemplo, Search gastó 248 mil y Sponsored 266 mil en la semana del 30 de noviembre de 2025, frente a promedios cercanos a 50 mil). Por eso la relación positiva entre gasto y ventas de las dispersiones **no permite concluir que la pauta cause las ventas**: ambas siguen el mismo calendario.
 
-**Picos.** Las 8 semanas de mayores ventas están todas entre la semana de Thanksgiving y mediados de diciembre, y el patrón se repite de forma casi idéntica en 2024 y 2025. Por mes, diciembre promedia 23,7 millones y noviembre 17,5 millones, frente a unos 3,4 millones en julio, el mes más bajo.
-
-**Cambios de nivel.** El promedio semanal subió de 7,53 millones en 2024 a 8,23 millones en 2025. El promedio de 2026 (5,18 millones) no es comparable, porque esas 31 semanas van de enero a julio y no incluyen temporada alta.
-
-**Gasto por canal.** El gasto de los tres canales también se concentra en noviembre y diciembre. Por ejemplo, en la semana del 30 de noviembre de 2025, Search gastó 248 mil u.m. y Sponsored 266 mil, frente a promedios anuales cercanos a 50 mil. Search casi duplicó su gasto promedio de 2024 a 2025 (de 23 mil a 52 mil por semana).
-
-**Asociaciones.** Las dispersiones muestran una relación positiva entre las ventas y el costo de cada canal. Pero, como el gasto aumenta justo en las semanas en que las ventas ya son altas, esta asociación **no permite concluir que la pauta cause las ventas**: ambas siguen el mismo calendario.
-
-La covarianza depende de las unidades de cada variable: la de Sales con las impresiones (del orden de $10^{14}$) es enorme solo porque las impresiones se cuentan en decenas de millones. Por eso no sirve para comparar la fuerza de las relaciones entre sí. La correlación estandariza ambas variables y queda entre $-$1 y 1, así que sí permite comparar.
-
-- **Las correlaciones más altas con Sales** son las de las impresiones de Search (0,79), el costo de Sponsored (0,74) y el costo de Search (0,74). El costo de DSP tiene una correlación menor (0,54).
-- **Los controles de Trends tienen correlación negativa** (Non-Brand $-$0,53; Brand $-$0,48). Esto se explica porque las búsquedas de alquiler de autos en EE. UU. alcanzan su máximo en junio y julio, mientras que las ventas de esta empresa alcanzan su máximo en noviembre y diciembre.
-- **SP500, WEI e ICSA casi no se correlacionan con las ventas.**
-- **Brand y Non-Brand se correlacionan 0,87 entre sí**, lo que anticipa redundancia entre ellas.
-
-La matriz completa está en el anexo A4.
+La covarianza depende de las unidades (la de Sales con las impresiones es del orden de $10^{14}$), así que no sirve para comparar la fuerza de las relaciones; la correlación sí, porque está entre $-1$ y 1 (anexos A4 y A8). Las más altas con Sales son las impresiones de Search (0,79) y los costos de Sponsored (0,74) y Search (0,74); DSP llega a 0,54. Trends tiene correlación negativa (Non-Brand $-0,53$) porque las búsquedas de alquiler alcanzan su máximo en junio y julio, cuando esta empresa vende menos. SP500, WEI e ICSA casi no se correlacionan con las ventas.

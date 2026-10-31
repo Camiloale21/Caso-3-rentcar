@@ -5,25 +5,19 @@
 
 ## Modelo (1): regresiones simples por canal
 
-Los tres canales tienen pendiente positiva y significativa (p < 0,001; con errores HAC, p $\le$ 0,014). Por cada 1.000 u.m. adicionales de costo, las ventas de esa semana son mayores en:
+Los tres canales tienen pendiente positiva y significativa (p < 0,001; p HAC $\le$ 0,014; detalle en el anexo A8):
 
-| Canal | Cambio en ventas por 1.000 u.m. | IC 95 % | $R^2$ |
+| Canal | Ventas por 1.000 u.m. de costo | IC 95 % | $R^2$ |
 |---|---|---|---|
 | DSP | 102 mil u.m. | [75 mil; 130 mil] | 0,29 |
 | Search | 122 mil u.m. | [103 mil; 141 mil] | 0,55 |
 | Sponsored | 142 mil u.m. | [120 mil; 164 mil] | 0,55 |
 
-Search y Sponsored explican cada uno cerca del 55 % de la variación de las ventas.
-
-Estas magnitudes **no deben leerse como retorno de la pauta**. Cada regresión simple omite la temporada y los otros dos canales. Como el gasto de todos los canales sube en noviembre y diciembre, que es cuando las ventas ya son altas, cada pendiente recoge a la vez la estacionalidad y la pauta de los otros canales. Es un sesgo por variable omitida que muy probablemente infla los tres coeficientes.
+Estas cifras **no son el retorno de la pauta**: cada regresión omite la temporada y los otros canales, que suben juntos en noviembre y diciembre. Ese sesgo por variable omitida muy probablemente infla las tres pendientes.
 
 ## Modelo (2): regresión múltiple con controles
 
-Partimos de los seis candidatos: SP500, WEI y los cuatro controles externos. Con todos incluidos, **Trends_Brand tuvo un VIF de 12,6**, por encima del umbral de 5, porque se correlaciona 0,87 con Trends_NonBrand y ambos miden casi lo mismo. Al eliminarlo, todos los controles quedaron con VIF $\le$ 2,8. SP500 y WEI se correlacionan 0,62, pero su VIF es aceptable (2,7 y 1,8), así que los conservamos.
-
-**Controles finales:** SP500, WEI, Trends_NonBrand, Gas_Precio e ICSA. Los costos de Search y Sponsored tienen VIF de 8,0 y 6,8 porque se mueven juntos en la temporada. Los mantenemos porque son el objeto de estudio, pero eso hace que sus coeficientes individuales sean imprecisos.
-
-Una advertencia sobre Trends_NonBrand: es contemporáneo a las ventas y lo usamos como control de la demanda de la categoría, no como causa.
+Con los seis candidatos, **Trends_Brand tuvo VIF de 12,6** (se correlaciona 0,87 con Trends_NonBrand), así que lo eliminamos. Los demás controles quedaron con VIF $\le$ 2,8: **SP500, WEI, Trends_NonBrand, Gas_Precio e ICSA** (anexo A8). Los costos de Search y Sponsored tienen VIF de 8,0 y 6,8 porque se mueven juntos; los mantenemos porque son el objeto de estudio.
 
 ```{r m2}
 c2 <- leer_tab("07_multiple_coeficientes")
@@ -37,16 +31,6 @@ knitr::kable(a2[, c("modelo", "n", "k", "r2", "r2_aj", "F", "p_F")], digits = 3,
              caption = "Ajuste y prueba F global del Modelo (2)")
 ```
 
-Para cada coeficiente contrastamos $H_0: \beta_j = 0$ frente a $H_1: \beta_j \neq 0$.
+Para cada coeficiente contrastamos $H_0: \beta_j = 0$ frente a $H_1: \beta_j \neq 0$. **Solo Sponsored es significativo**: manteniendo lo demás constante, 1 u.m. más de costo se asocia con 83,5 u.m. más de ventas (t = 3,28; p = 0,001; IC 95 % [33,2; 133,9]; p HAC = 0,020). Search (38,4; p = 0,11) y DSP (6,4; p = 0,65) no permiten rechazar $H_0$. Trends_NonBrand tiene un coeficiente de $-180.790$ u.m. por punto (p < 0,001), un signo que **no es razonable como efecto de demanda**: actúa como indicador inverso de la temporada. Los demás controles no son significativos, y el intercepto (17,3 millones) no tiene interpretación económica. $R^2$ = 0,673, $R^2$ ajustado = 0,652, y la prueba F (32,4; p < 0,001) rechaza que todas las pendientes sean cero. En `Orders` los coeficientes se dividen entre 25.000 (por ejemplo, 3,3 órdenes por cada 1.000 u.m. en Sponsored), con los mismos t y p.
 
-- **Sponsored** es el único canal significativo cuando se controla por los demás. Manteniendo constantes los otros regresores, 1 u.m. más de costo en Sponsored se asocia con 83,5 u.m. más de ventas en la semana (t = 3,28; p = 0,001; IC 95 % [33,2; 133,9]). El resultado se mantiene con errores HAC (p = 0,020).
-- **Search y DSP** tienen coeficientes positivos pero no significativos: 38,4 (p = 0,11) y 6,4 (p = 0,65). Sus intervalos incluyen el cero, así que no podemos rechazar $H_0$. Al separar los canales, la asociación que mostraban las regresiones simples se concentra en Sponsored.
-- **Trends_NonBrand** tiene un coeficiente de $-$180.790 u.m. por punto del índice (p < 0,001). Su signo **no es razonable como efecto de demanda**: refleja que el interés de búsqueda alcanza su máximo en verano, cuando esta empresa vende menos. Funciona, en la práctica, como un indicador inverso de la temporada.
-- **SP500, WEI, Gas_Precio e ICSA** no son significativos.
-- **El intercepto** (17,3 millones; p = 0,048) no tiene interpretación económica, porque correspondería a valores imposibles de los regresores (por ejemplo, un S&P 500 igual a 0).
-
-**Ajuste global.** $R^2$ = 0,673 y $R^2$ ajustado = 0,652. La prueba F (F = 32,4 con 8 y 126 gl; p < 0,001) rechaza que todas las pendientes sean cero.
-
-**Orders.** Como Sales = 25.000 $\times$ Orders, el modelo de `Orders` da los mismos t, p y $R^2$, con los coeficientes divididos entre 25.000. Por ejemplo, 1.000 u.m. adicionales en Sponsored se asocian con 3,3 órdenes más.
-
-**Límites para hablar de incrementalidad.** El presupuesto se asigna anticipando la temporada, lo que genera causalidad inversa. Además, hay variables omitidas, como precios, inventario de vehículos y competencia, y el gasto no tiene variación exógena. Por eso estos coeficientes son asociaciones condicionales, no el retorno incremental de la pauta.
+**No podemos hablar de incrementalidad**: el presupuesto se asigna anticipando la temporada (causalidad inversa), hay variables omitidas (precios, flota, competencia) y el gasto no tiene variación exógena.
