@@ -20,31 +20,31 @@ knitr::kable(data.frame(
 ), caption = "Reconocimiento de Base_datos_caso_3.csv")
 ```
 
-**PENDIENTE (Persona 1):** en 3 a 4 frases, explicar qué representa una fila, cuál es la fecha semanal, cuáles son las variables de respuesta (`Sales`, `Orders`) y qué columnas de publicidad hay. Mencionar que `Sales` es exactamente un múltiplo constante de `Orders` y qué implica eso para los modelos.
+Cada fila de la base es una semana. `Week` es siempre un domingo, que tomamos como el inicio de la semana, y la muestra va del 7 de enero de 2024 al 2 de agosto de 2026: 135 semanas consecutivas, sin duplicados ni valores faltantes. Las variables de respuesta son `Sales` (ventas; la moneda no está documentada, así que la reportamos como unidades monetarias, u.m.) y `Orders` (órdenes, con decimales). La publicidad viene en 14 campañas, cada una con costo (`.Cost`) e impresiones (`.Impression`): 10 de Amazon y 4 de Google. Además, la base trae dos controles macroeconómicos, `SP500` y `WEI`.
 
-```{r datos-ajustes}
-knitr::kable(leer_tab("01_registro_ajustes"),
-             caption = "Ajustes aplicados y su impacto sobre la muestra")
-```
+Un hallazgo clave es que **`Sales` es exactamente 25.000 veces `Orders` en todas las semanas** (la razón solo varía en el sexto decimal, por el redondeo de `Orders`). Por eso los modelos de `Orders` son los de `Sales` en otra escala: tienen los mismos estadísticos t, valores p y $R^2$, y no aportan evidencia independiente.
+
+El único ajuste fue convertir `Week` de texto a fecha, sin pérdida de filas. Seis semanas tienen ventas a más de 3 desviaciones estándar de la media, todas entre finales de noviembre y mediados de diciembre. No las eliminamos, porque son la temporada alta que el caso pide analizar.
 
 ## Agregados de Amazon
 
-```{r datos-comprobacion}
-cm <- leer_tab("02_comprobacion_manual")
-knitr::kable(cm[, c("semana", "canal", "tipo", "suma_manual", "agregado_script", "diferencia")],
-             format.args = list(big.mark = ","),
-             caption = "Comprobación manual de las sumas por prefijo (dos semanas)")
-```
-
-**PENDIENTE (Persona 1):** explicar la regla de agregación por prefijo y sufijo, cuántas campañas forma cada canal y por qué Google queda fuera de los agregados. La columna `operacion` de `outputs/tablas/02_comprobacion_manual.csv` muestra la suma término a término; va en el anexo.
+Para cada semana sumamos, por separado, los costos (columnas que terminan en `.Cost`) y las impresiones (que terminan en `.Impression`) de las campañas cuyo nombre empieza por cada prefijo. Así, `Amazon_DSP` agrupa 2 campañas (Evergreen y Seasonal), `Amazon_Search` agrupa 4 (Men/Women $\times$ Brand/Non-Brand) y `Amazon_Sponsored` agrupa 4. Las 4 campañas Google quedan fuera de los agregados, como pide el caso, y se conservan solo para la exploración. La comprobación manual en dos semanas (la primera de la muestra y una de temporada alta) da diferencia 0 en los seis agregados; el detalle término a término está en el anexo A2. En la primera semana el costo de Search es 0: ese canal no tuvo gasto en 35 de las 135 semanas.
 
 ## Controles externos
 
-```{r datos-ficha}
-f <- leer_tab("03_ficha_controles")
-knitr::kable(f[, c("variable", "termino_o_codigo", "fuente", "frecuencia_original",
-                   "regla_alineacion", "fecha_consulta")],
-             caption = "Series externas incorporadas (detalle completo en fuentes_y_glosario.md)")
-```
+Incorporamos cuatro controles adicionales, cada uno con una hipótesis sobre la demanda de alquiler:
 
-**PENDIENTE (Persona 1):** justificar en 4 a 5 frases cada control (hipótesis sobre la demanda de alquiler). Explicar la configuración de Google Trends, aclarar que los índices son relativos y no volúmenes, y describir la regla de alineación que evita usar información todavía no publicada.
+- **Trends_Brand** (`hertz + avis + enterprise rent a car`): como la empresa del caso es anónima, usamos el interés en las marcas líderes como aproximación de la demanda con intención de marca.
+- **Trends_NonBrand** (`car rental + rental car`): la demanda genérica del servicio.
+- **Gas_Precio** (GASREGW): la gasolina encarece el viaje por carretera.
+- **ICSA** (solicitudes iniciales de desempleo): mide casi en tiempo real el deterioro del mercado laboral, que reduce el gasto en viajes.
+
+Las dos series de Trends se descargaron **en una sola consulta**, con país EE. UU., categoría Viajes (que evita que "hertz" se confunda con la unidad de frecuencia), búsqueda web y rango del 7 de enero de 2024 al 8 de agosto de 2026. Por eso comparten escala. Son índices de 0 a 100 **relativos a esa consulta**, no volúmenes de búsqueda.
+
+Para no usar información futura, cada semana toma el último dato **ya publicado** el domingo en que empieza:
+
+- **Trends:** la misma semana, porque Google la publica casi en tiempo real; sus fechas coinciden exactamente con `Week`.
+- **Gasolina:** el lunes anterior (6 días antes).
+- **ICSA:** la semana que terminó 8 días antes, porque cada dato se publica el jueves siguiente.
+
+La muestra conserva las 135 semanas sin faltantes.

@@ -87,9 +87,11 @@ atipicas <- data.frame(Week = crudo$Week, Sales = crudo$Sales, Orders = crudo$Or
 
 # --- 4. Relación entre Sales y Orders ------------------------------------------
 razon <- crudo$Sales / crudo$Orders
-razon_constante <- diff(range(razon)) < 1e-6
+# Tolerancia relativa: Orders viene redondeado, así que la razón varía solo
+# en el sexto decimal (p. ej. 24999.99999 a 25000.00001)
+razon_constante <- diff(range(razon)) / mean(razon) < 1e-6
 if (razon_constante) {
-  message("ATENCIÓN: Sales = ", format(razon[1], big.mark = ","),
+  message("ATENCIÓN: Sales = ", format(round(mean(razon)), big.mark = ","),
           " x Orders en TODAS las semanas. Los modelos de Sales y Orders",
           " tendrán los mismos t, p y R2 (solo cambia la escala).")
 }
@@ -106,7 +108,7 @@ resumen <- data.frame(
   semanas_duplicadas = dup_semanas, filas_duplicadas = dup_filas,
   total_na = sum(is.na(crudo)),
   razon_Sales_Orders_constante = razon_constante,
-  razon_Sales_Orders = if (razon_constante) razon[1] else NA_real_,
+  razon_Sales_Orders = if (razon_constante) round(mean(razon)) else NA_real_,
   md5_original = md5_antes
 )
 print(t(resumen))

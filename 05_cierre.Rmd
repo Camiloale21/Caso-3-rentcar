@@ -4,13 +4,13 @@
      resultados de la Persona 2. Máximo 200 palabras (requisito del
      punto 9). Usar los números de las tablas, no inventar cifras. -->
 
-**PENDIENTE (Persona 1, con aportes de la Persona 2) — máximo 200 palabras.** Debe cubrir, en este orden:
+Las ventas dependen sobre todo del calendario: entre Thanksgiving y mediados de diciembre se venden unos 21 millones de u.m. más por semana que en el resto del año. Esta temporada explica la mayor parte de la variación, más que cualquier canal de pauta.
 
-1. **Asociaciones encontradas:** qué canal de Amazon se asocia con más ventas por cada u.m. invertida, con su intervalo, y cuáles no son significativos.
-2. **Especificación más defendible:** cuál modelo (nivel, log, dummies o log + dummies) y por qué. Debe basarse en el MAE y RMSE fuera de muestra y en los diagnósticos, no solo en el $R^2$.
-3. **Papel de los controles externos:** cuáles se quedaron en el modelo y qué cambió al incluirlos.
-4. **Limitaciones:** datos observacionales, presupuesto que se asigna anticipando la demanda (causalidad inversa), estacionalidad y una sola temporada alta en el entrenamiento.
-5. **Qué se puede concluir y qué no:** una regresión observacional muestra asociaciones condicionales, no incrementalidad. Para medir el efecto causal hacen falta experimentos (geo-tests o *holdouts* de campañas, pruebas A/B de pauta) o variación exógena del gasto.
+Sin controlar la temporada, los tres canales de Amazon parecen rentables. Con controles, solo Sponsored conserva una asociación positiva y significativa (83,5 u.m. de ventas por u.m. invertida; IC 95 %: 33–134). Al agregar las dummies de temporada, la atribución entre canales se vuelve inestable y cambia al excluir unas pocas semanas de diciembre.
+
+La especificación más defendible es en niveles con dummies de calendario. Es la que mejor predice semanas no vistas (error medio del 21 %) y la que menos autocorrelación deja. De los controles externos, solo el interés de búsqueda genérica resultó relevante, y como indicador de la temporada.
+
+Estos resultados son asociaciones, no efectos causales. La pauta aumenta justo cuando la demanda ya es alta, y solo observamos dos temporadas. Para medir cuánto vende realmente cada canal recomendamos experimentos: apagar campañas en algunas regiones o semanas (*holdouts*, geo-tests).
 
 ```{r cierre-conteo, eval=FALSE}
 # Para contar palabras del cierre antes de entregar:

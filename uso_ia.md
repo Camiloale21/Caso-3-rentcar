@@ -17,7 +17,8 @@ Esta nota responde a la regla del syllabus: cada entrega debe indicar dónde y c
   - Corte temporal: entrenamiento hasta el 31 de agosto de 2025.
   - Retransformación del logaritmo con smearing de Duan.
 - **Hallazgo señalado por la IA:** que `Sales = 25.000 × Orders` en todas las semanas.
-- **Lo que NO hizo la IA:** no ejecutó el código ni produjo los resultados numéricos. Las tablas y gráficos se generaron al correr `main.R` en nuestro computador. Las interpretaciones del informe se redactaron o revisaron por el equipo a partir de esos resultados.
+- **Redacción del informe:** después de correr `main.R` en nuestro computador, compartimos las tablas de resultados (`outputs/tablas`) con la IA, que redactó borradores de las interpretaciones y del cierre ejecutivo con esas cifras. El equipo revisó y ajustó esos textos.
+- **Lo que NO hizo la IA:** no ejecutó el código ni produjo los resultados numéricos; todas las tablas y gráficos salen de correr `main.R`. Las conclusiones finales y la elección del modelo preferido son responsabilidad del equipo.
 
 ## Persona 1 — Datos, fuentes externas y exploración
 
