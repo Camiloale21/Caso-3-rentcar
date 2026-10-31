@@ -59,7 +59,7 @@ knitr::kable(leer_tab("01_auditoria_columnas"), digits = 2, format.args = list(b
 ## A2. Comprobación manual de agregados (detalle de la suma)
 
 ```{r anexo-comprobacion}
-knitr::kable(leer_tab("02_comprobacion_manual")[, c("semana", "canal", "tipo", "operacion")])
+knitr::kable(leer_tab("02_comprobacion_manual")[, c("semana", "canal", "tipo", "operacion", "diferencia")])
 ```
 
 ## A3. Ficha completa de controles externos
@@ -101,11 +101,30 @@ knitr::kable(leer_tab("10_sensibilidad_influyentes"), digits = 4, format.args = 
 knitr::include_graphics(c(fig("10_residuos_por_mes"), fig("10_acf_residuos")))
 ```
 
-## A8. Reproducibilidad y uso de IA
+## A8. Tablas complementarias del cuerpo del informe
+
+```{r anexo-complementarias}
+knitr::kable(leer_tab("01_registro_ajustes"), caption = "Ajustes aplicados a la base y su impacto sobre la muestra")
+knitr::kable(leer_tab("04_covarianzas_sales"), digits = 3, format.args = list(big.mark = ","),
+             caption = "Covarianza y correlación de Sales con las demás variables")
+knitr::kable(leer_tab("06_simples_coeficientes")[, c("modelo", "termino", "estimacion", "error_std", "t",
+                                                     "p_valor", "ic95_inf", "ic95_sup", "p_valor_hac")],
+             digits = 3, format.args = list(big.mark = ","), caption = "Modelo (1): regresiones simples")
+knitr::kable(leer_tab("06_simples_ajuste")[, c("modelo", "n", "r2", "r2_aj", "F", "p_F")], digits = 3,
+             caption = "Ajuste de las regresiones simples")
+knitr::kable(leer_tab("07_pertinencia_controles"), digits = 3, caption = "Pertinencia de los controles candidatos")
+knitr::kable(leer_tab("07_historial_vif"), digits = 2, caption = "Selección de controles: VIF por iteración")
+knitr::kable(leer_tab("08_caminos_ajuste_muestra_comun")[, c("modelo", "escala_dependiente", "r2_aj",
+                                                            "MAE_dentro_muestra", "RMSE_dentro_muestra", "smearing")],
+             digits = 3, format.args = list(big.mark = ","),
+             caption = "Ajuste en la muestra completa (el R2 de los modelos log no es comparable con el de los modelos en niveles)")
+```
+
+## A9. Reproducibilidad y uso de IA
 
 El repositorio contiene el código completo: ejecutar `source("main.R")` desde la raíz reproduce todas las tablas, los gráficos y este informe. La declaración de uso de IA de cada persona está en `uso_ia.md`.
 
-## A9. Referencias
+## A10. Referencias
 
 - Google LLC. *Google Trends*. https://trends.google.com/trends/ (consulta: ver `registro_descargas.csv`).
 - U.S. Energy Information Administration. *US Regular All Formulations Gas Price (GASREGW)*, recuperado de FRED, Federal Reserve Bank of St. Louis. https://fred.stlouisfed.org/series/GASREGW

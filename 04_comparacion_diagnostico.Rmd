@@ -20,23 +20,17 @@ knitr::kable(data.frame(
 ), caption = "Dummies de temporada definidas solo con fechas de calendario de EE. UU.")
 ```
 
-**PENDIENTE (Persona 2):** justificar las dummies con el calendario de viajes de EE. UU.: Thanksgiving y fin de año son los períodos de mayor volumen de viajes, y el verano entre Memorial Day y Labor Day es la temporada de vacaciones por carretera. Aclarar que no se definieron mirando cuándo el KPI fue alto, y comentar si los picos observados en la sección de exploración caen o no dentro de esas semanas.
+Las tres dummies se definieron solo con el calendario de viajes de EE. UU., no con el valor de las ventas:
 
-```{r caminos}
-cc <- leer_tab("08_caminos_coeficientes")
-cc <- cc[grepl("_Sales$", cc$modelo) & cc$termino != "(Intercept)", ]
-knitr::kable(cc[, c("modelo", "termino", "estimacion", "p_valor", "p_valor_hac", "efecto_pct_por_1000")],
-             digits = 4, format.args = list(big.mark = ","),
-             caption = "Coeficientes de los cuatro modelos para Sales (Orders: ver anexo)")
-```
+- **D_FinAno:** de Thanksgiving al 24 de diciembre, la temporada de compras y viajes de fin de año.
+- **D_Navidad:** del 25 de diciembre al 1 de enero.
+- **D_Verano:** de Memorial Day a Labor Day, la temporada de vacaciones por carretera.
+
+Las fechas festivas se calculan con su regla (por ejemplo, Thanksgiving es el cuarto jueves de noviembre). Las 8 semanas de mayores ventas de la muestra caen dentro de `D_FinAno`, lo que confirma que la regla de calendario captura los picos sin haberse construido a partir de ellos.
 
 ## Comparación de los caminos sobre una muestra común
 
 ```{r comparacion}
-aj <- leer_tab("08_caminos_ajuste_muestra_comun")
-knitr::kable(aj[, c("modelo", "n", "escala_dependiente", "r2_aj", "MAE_dentro_muestra", "RMSE_dentro_muestra")],
-             digits = 3, format.args = list(big.mark = ","),
-             caption = "Ajuste en la muestra completa (el R2 ajustado de los modelos log NO es comparable con el de los modelos en niveles)")
 mf <- leer_tab("09_metricas_fuera_muestra")
 knitr::kable(mf[mf$kpi == "Sales", c("modelo", "n_train", "n_test", "MAE", "RMSE", "MAE_rel_media")],
              digits = 3, format.args = list(big.mark = ","),
@@ -47,15 +41,23 @@ knitr::kable(mf[mf$kpi == "Sales", c("modelo", "n_train", "n_test", "MAE", "RMSE
 knitr::include_graphics(fig("09_predicciones_test_Sales"))
 ```
 
-**PENDIENTE (Persona 2):** explicar:
+**Camino A (logaritmo).** Comprime la escala y reduce el peso de los picos, y los coeficientes se leen en porcentaje. En M3, 1.000 u.m. más en Sponsored se asocian con +0,49 % de ventas (p = 0,012); DSP (+0,18 %) y Search (+0,30 %) solo son significativos al 10 %. Pero el logaritmo **no controla la temporada**.
 
-- Qué problema intenta resolver cada camino: el log comprime la escala y estabiliza la varianza; las dummies capturan el cambio de nivel en temporada.
-- Qué cambia en la interpretación: efectos en % frente a efectos en u.m.
-- Cuándo los dos caminos son complementarios (M5).
-- Cómo se retransformaron las predicciones del log (exp ingenuo frente a smearing de Duan) y por qué importa.
-- Qué modelo predice mejor según el MAE y el RMSE. No elegir por el $R^2$, porque la variable dependiente tiene otra escala.
+**Camino B (dummies).** Modela directamente el cambio de nivel. En M4, las semanas de `D_FinAno` venden 21,2 millones de u.m. más que el resto, a igualdad de pauta y controles (IC 95 % [18,7; 23,8] millones; p < 0,001). La semana de Navidad vende 3,7 millones más (p = 0,001), y el verano no difiere significativamente.
 
-Mencionar que el entrenamiento contiene una sola temporada alta.
+**Lo que cambia al controlar la temporada:**
+- Sponsored deja de ser significativo (9,0; p = 0,55).
+- DSP pasa a serlo (23,7 u.m. por u.m.; p = 0,003; p HAC = 0,028).
+
+Es decir, en el Modelo 2 parte de la asociación atribuida a Sponsored era en realidad la temporada.
+
+**Caminos combinados (M5).** Los dos caminos son complementarios cuando se quieren efectos en porcentaje con la temporada controlada. En M5, la temporada de fin de año se asocia con un 175 % más de ventas y el verano con un 15 % menos (p = 0,015).
+
+**Comparación predictiva.** El $R^2$ de los modelos log no es comparable con el de los modelos en niveles, porque explican otra variable. Por eso comparamos con MAE y RMSE en u.m.:
+- Entrenamos cada modelo con las semanas hasta el 31 de agosto de 2025 (87 semanas, con una sola temporada alta) y lo evaluamos en las 48 semanas siguientes, que incluyen la temporada de 2025.
+- Las predicciones log se devolvieron a niveles con $e^{\hat y}$ y con la corrección de *smearing* de Duan, porque $e^{\hat y}$ estima la mediana y no la media. Aquí la corrección casi no cambia el resultado: el factor es 1,04, y el RMSE incluso empeora levemente.
+
+**Resultado.** **M4 (niveles con dummies) es el que mejor predice:** MAE de 1,78 millones (21 % de la media) y RMSE de 2,73 millones. Le siguen M5 (MAE 2,30 millones; RMSE 5,10 millones), M2 (2,92 y 4,80 millones) y M3 (3,25 y 6,69 millones). Las dummies aportan mucho más que el logaritmo.
 
 ## Diagnóstico
 
@@ -71,12 +73,18 @@ knitr::kable(pf[grepl("_Sales$", pf$modelo),
              caption = "Pruebas formales (p-valores). BP: heterocedasticidad; DW y BG(4): autocorrelación")
 ```
 
-**PENDIENTE (Persona 2):** explicar qué mide cada prueba:
+**Heterocedasticidad.** La prueba de Breusch-Pagan contrasta $H_0$: varianza constante de los errores. Se rechaza en los cuatro modelos (p < 0,01): los errores son más grandes en temporada alta.
 
-- Breusch-Pagan: H0 de varianza constante.
-- Durbin-Watson y Breusch-Godfrey: H0 de que no hay autocorrelación de orden 1 y de hasta orden 4.
-- VIF: inflación de la varianza por colinealidad.
-- Distancia de Cook: influencia de cada observación.
-- ACF en el rezago 52 y residuos por mes: estacionalidad que queda sin explicar.
+**Autocorrelación.** Durbin-Watson y Breusch-Godfrey contrastan $H_0$: no hay autocorrelación de orden 1 y de hasta orden 4, respectivamente. También se rechaza en todos los modelos, aunque M4 es el que menos autocorrelación deja: DW = 1,45 y ACF de rezago 1 = 0,27, frente a DW = 0,92 y ACF = 0,54 en M2. Por estos dos problemas, la inferencia se apoya en los **p-valores HAC (Newey-West)**, que corrigen ambos.
 
-Luego decir cómo cambian (o no) la decisión de modelo. Por ejemplo, si hay autocorrelación, la inferencia se apoya en los p-valores HAC. Comentar `10_sensibilidad_influyentes`: ¿los coeficientes cambian mucho al quitar las semanas influyentes? Recordar que agregar variables no mejora automáticamente la especificación.
+**Estacionalidad residual.** La autocorrelación de rezago 52 sigue siendo de 0,34 en M4, por encima de la banda de $\pm$0,17. Queda un patrón anual sin explicar, por ejemplo semanas de octubre y enero con ventas altas.
+
+**Multicolinealidad.** El VIF mide cuánto se infla la varianza de un coeficiente por colinealidad. En M4, Search (8,6) y Sponsored (8,0) siguen siendo altos, porque su gasto se mueve junto, y eso hace inestable la atribución entre canales.
+
+**Observaciones influyentes.** La distancia de Cook mide cuánto cambia el modelo al quitar una observación. En M4, 13 semanas superan $4/n$, casi todas de noviembre y diciembre. Al reestimar sin ellas:
+- DSP baja de 23,7 a 7,8 y deja de ser significativo.
+- Sponsored sube de 9,0 a 39,4 (p = 0,001).
+
+Es decir, **qué canal "gana" depende de unas pocas semanas de temporada alta**. Lo único consistente en todas las especificaciones es que Sponsored mantiene un signo positivo y es significativo en la mayoría de ellas.
+
+**Decisión.** Mantenemos M4 como la especificación más defendible, por su mejor capacidad predictiva y su menor autocorrelación. Lo reportamos con errores HAC y sin atribuirle causalidad a ningún canal individual. Agregar más variables no resolvería el problema: los regresores adicionales serían también estacionales y aumentarían la colinealidad.
