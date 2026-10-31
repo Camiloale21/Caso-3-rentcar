@@ -1,0 +1,17 @@
+   # R / RStudio
+   .Rproj.user/
+   .Rhistory
+   .RData
+   .Ruserdata
+   *.Rproj.user
+
+   # Sistema
+   .DS_Store
+   Thumbs.db
+
+   # Archivos generados: se reconstruyen con main.R
+   data/processed/
+   outputs/
+   *.log
+   *.tex
+   informe_files/
