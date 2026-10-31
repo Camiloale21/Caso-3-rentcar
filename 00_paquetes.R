@@ -10,7 +10,6 @@ paquetes <- c(
   "scales",     # formato de ejes
   "lmtest",     # coeftest, bptest, bgtest, dwtest
   "sandwich",   # errores estándar HAC (Newey-West)
-  "car",        # VIF
   "knitr",      # tablas del informe
   "rmarkdown"   # compilación del informe
 )

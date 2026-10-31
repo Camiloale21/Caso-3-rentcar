@@ -28,7 +28,7 @@ Todos los archivos están en la raíz del repositorio. Las carpetas `data/proces
 ## Requisitos
 
 - R ≥ 4.2 y RStudio.
-- Paquetes (se instalan solos al correr `00_paquetes.R`): `dplyr`, `tidyr`, `ggplot2`, `scales`, `lmtest`, `sandwich`, `car`, `knitr`, `rmarkdown`.
+- Paquetes (se instalan solos al correr `00_paquetes.R`): `dplyr`, `tidyr`, `ggplot2`, `scales`, `lmtest`, `sandwich`, `knitr`, `rmarkdown`.
 - Para el PDF: una distribución de LaTeX. La más simple es `install.packages("tinytex"); tinytex::install_tinytex()`.
 
 ## Cómo ejecutar

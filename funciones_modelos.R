@@ -50,6 +50,19 @@ tabla_ajuste <- function(modelo, nombre) {
   )
 }
 
+# VIF (factor de inflación de la varianza) de cada regresor de un modelo lineal.
+# VIF_j = 1 / (1 - R2_j), donde R2_j sale de regresar el regresor j contra los
+# demás regresores. Equivale a car::vif() para regresores numéricos (sin factores).
+calcular_vif <- function(modelo) {
+  X <- stats::model.matrix(modelo)
+  X <- X[, colnames(X) != "(Intercept)", drop = FALSE]
+  if (ncol(X) < 2) stop("El VIF necesita al menos 2 regresores.")
+  vapply(colnames(X), function(j) {
+    r2 <- summary(stats::lm(X[, j] ~ X[, colnames(X) != j, drop = FALSE]))$r.squared
+    1 / (1 - r2)
+  }, numeric(1))
+}
+
 # Ajusta un lm a partir de nombres de columnas (evita escribir fórmulas a mano)
 ajustar <- function(respuesta, regresores, datos) {
   stats::lm(stats::reformulate(regresores, response = respuesta), data = datos)

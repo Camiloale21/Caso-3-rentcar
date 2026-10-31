@@ -36,7 +36,7 @@ seleccion_vif <- function(datos, respuesta, fijos, candidatos, umbral) {
   historial <- list()
   repeat {
     m <- ajustar(respuesta, c(fijos, actuales), datos)
-    v <- car::vif(m)
+    v <- calcular_vif(m)
     historial[[length(historial) + 1]] <- data.frame(
       iteracion = length(historial) + 1, variable = names(v), vif = unname(v))
     v_ctrl <- v[actuales]
@@ -76,8 +76,8 @@ names(modelos_multiples) <- paste0("M2_", KPIS)
 
 coefs  <- do.call(rbind, Map(tabla_coeficientes, modelos_multiples, names(modelos_multiples)))
 ajuste <- do.call(rbind, Map(tabla_ajuste,       modelos_multiples, names(modelos_multiples)))
-vif_final <- data.frame(variable = names(car::vif(modelos_multiples$M2_Sales)),
-                        vif = unname(car::vif(modelos_multiples$M2_Sales)))
+v_final   <- calcular_vif(modelos_multiples$M2_Sales)
+vif_final <- data.frame(variable = names(v_final), vif = unname(v_final))
 print(ajuste)
 
 # Comprobación: si Sales = c * Orders, los coeficientes de Sales son c veces los de Orders

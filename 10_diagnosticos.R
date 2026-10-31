@@ -49,7 +49,7 @@ print(pruebas, digits = 3)
 
 # --- 2. VIF -------------------------------------------------------------------
 vifs <- do.call(rbind, lapply(names(modelos), function(nm) {
-  v <- car::vif(modelos[[nm]])
+  v <- calcular_vif(modelos[[nm]])
   data.frame(modelo = nm, variable = names(v), vif = unname(v))
 }))
 
